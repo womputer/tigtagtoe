@@ -182,7 +182,7 @@ The sampler trims quoted reply chains (`-----Original Message-----` and friends)
 ## Deploy notes
 
 - Frontend on Vercel reads `VITE_API_BASE_URL` at build time. Point it at the Render URL.
-- Backend on Render reads everything from env vars. SQLite lives on a 1 GB persistent disk so data survives restarts. Switching to Render Postgres is a one-line change in `DATABASE_URL`.
+- Backend on Render reads everything from env vars. SQLite lives inside the container on the free tier, which means data resets when Render restarts the service. For a portfolio demo this is fine because the sample CSV is one click away. Persistent storage means moving to a paid Render plan with a disk, or switching `DATABASE_URL` to a Render Postgres instance.
 - First request to a cold Render free-tier service can take 30 to 60 seconds. The upload page shows a "warming up" state when that happens.
 - CORS is restricted to `CORS_ORIGINS`. Add your Vercel URL there.
 

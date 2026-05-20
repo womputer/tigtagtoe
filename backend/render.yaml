@@ -12,8 +12,12 @@ services:
         sync: false
       - key: ANTHROPIC_MODEL
         value: claude-haiku-4-5-20251001
+      # SQLite lives inside the container on the free tier. It is ephemeral:
+      # when Render restarts the service (idle timeout, redeploy, etc) the
+      # database resets. Reviewers just re-upload the sample CSV. Swap to
+      # Postgres by changing this value to a postgresql+psycopg URL.
       - key: DATABASE_URL
-        value: sqlite:////var/data/tigtagtoe.db
+        value: sqlite:///./tigtagtoe.db
       - key: CORS_ORIGINS
         sync: false
       - key: AGENT_CONCURRENCY
@@ -22,7 +26,3 @@ services:
         value: "300"
       - key: MAX_BODY_CHARS
         value: "4000"
-    disk:
-      name: tigtagtoe-data
-      mountPath: /var/data
-      sizeGB: 1
