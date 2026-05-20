@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html, body, #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-bg text-ink-50 font-sans antialiased;
+    font-feature-settings: "ss01", "cv11";
+
+    /* A faint vignette that gives the page depth without drawing attention. */
+    background-image:
+      radial-gradient(1200px 800px at 15% -10%, rgba(124,92,255,0.10), transparent 60%),
+      radial-gradient(900px 600px at 90% 110%, rgba(79,209,199,0.06), transparent 60%);
+    background-attachment: fixed;
+  }
+
+  /* Subtle grain. Keep it cheap (CSS gradient stack, no PNG). */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.45;
+    mix-blend-mode: overlay;
+    background-image:
+      repeating-radial-gradient(circle at 0 0, rgba(255,255,255,0.014) 0, rgba(255,255,255,0.014) 1px, transparent 1px, transparent 3px);
+  }
+
+  ::selection {
+    background: rgba(124, 92, 255, 0.35);
+  }
+
+  /* Better focus rings everywhere by default. */
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(124, 92, 255, 0.55);
+    border-radius: 6px;
+  }
+
+  /* Scrollbar polish (WebKit). */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.16);
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-surface-1 backdrop-blur-xl border border-line shadow-soft;
+  }
+
+  .glass-strong {
+    @apply bg-surface-2 backdrop-blur-xl border border-line-strong shadow-soft;
+  }
+
+  .display-serif {
+    @apply font-serif tracking-tightest;
+    font-feature-settings: "ss01";
+  }
+
+  .hairline {
+    @apply border-line border;
+  }
+
+  .shimmer {
+    background-image: linear-gradient(
+      90deg,
+      rgba(255,255,255,0.04) 0%,
+      rgba(255,255,255,0.10) 50%,
+      rgba(255,255,255,0.04) 100%
+    );
+    background-size: 200% 100%;
+    @apply animate-shimmer;
+  }
+
+  /* The big "T" mark, used in the logo and as a giant background ornament. */
+  .logo-mark {
+    font-family: 'Instrument Serif', serif;
+    font-feature-settings: "ss01";
+  }
+}
