@@ -18,8 +18,10 @@ services:
       # Postgres by changing this value to a postgresql+psycopg URL.
       - key: DATABASE_URL
         value: sqlite:///./tigtagtoe.db
+      # Allow the production Vercel frontend (and local Vite) by default.
+      # Override if you use a preview/custom domain.
       - key: CORS_ORIGINS
-        sync: false
+        value: https://tigtagtoe.vercel.app,http://localhost:5173
       - key: AGENT_CONCURRENCY
         value: "5"
       - key: MAX_EMAILS_PER_RUN

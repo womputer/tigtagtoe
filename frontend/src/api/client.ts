@@ -7,7 +7,8 @@ import type {
   UploadStatus,
 } from "./types";
 
-const BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, "")
+  || "http://localhost:8000";
 
 class ApiError extends Error {
   status: number;
@@ -17,17 +18,35 @@ class ApiError extends Error {
   }
 }
 
+function networkErrorMessage(err: unknown): string {
+  const raw = err instanceof Error ? err.message : String(err);
+  // Browsers typically surface offline / CORS / DNS failures as TypeError: Failed to fetch.
+  if (/failed to fetch|networkerror|load failed|network request failed/i.test(raw)) {
+    return (
+      "Can't reach the API. If the backend is on Render free tier it may be waking up " +
+      "(30–60s). Confirm VITE_API_BASE_URL on Vercel points at the live API, and that " +
+      "CORS_ORIGINS includes https://tigtagtoe.vercel.app."
+    );
+  }
+  return raw;
+}
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    ...init,
-    headers: {
-      Accept: "application/json",
-      ...(init.body && !(init.body instanceof FormData)
-        ? { "Content-Type": "application/json" }
-        : {}),
-      ...(init.headers ?? {}),
-    },
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${BASE}${path}`, {
+      ...init,
+      headers: {
+        Accept: "application/json",
+        ...(init.body && !(init.body instanceof FormData)
+          ? { "Content-Type": "application/json" }
+          : {}),
+        ...(init.headers ?? {}),
+      },
+    });
+  } catch (err) {
+    throw new ApiError(networkErrorMessage(err), 0);
+  }
 
   if (!res.ok) {
     let detail = `${res.status} ${res.statusText}`;
@@ -100,6 +119,11 @@ export const api = {
   listTools(): Promise<{ tools: { name: string; description: string; required_arguments: string[] }[] }> {
     return request("/api/tools");
   },
+
+  /** Lightweight probe used by the upload page to distinguish cold-start vs offline. */
+  healthz(): Promise<{ status: string }> {
+    return request<{ status: string }>("/healthz");
+  },
 };
 
-export { ApiError };
+export { ApiError, BASE as API_BASE_URL };

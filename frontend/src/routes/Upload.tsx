@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { api, ApiError } from "@/api/client";
+import { api, ApiError, API_BASE_URL } from "@/api/client";
 import { useUploadStore } from "@/store/upload";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { Button } from "@/components/ui/Button";
@@ -104,8 +104,11 @@ export function Upload() {
       <UploadDropzone onFile={handleFile} disabled={isWorking} />
 
       {error ? (
-        <div className="mt-6 glass rounded-2xl border-bad/30 bg-bad/10 px-5 py-4 text-sm text-bad">
-          {error}
+        <div className="mt-6 glass rounded-2xl border-bad/30 bg-bad/10 px-5 py-4 text-sm text-bad space-y-2">
+          <div>{error}</div>
+          <div className="text-[11px] text-ink-400 font-mono break-all">
+            API: {API_BASE_URL}
+          </div>
         </div>
       ) : null}
 

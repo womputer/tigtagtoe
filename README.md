@@ -15,7 +15,7 @@ I built TigTagToe to explore how an AI agent can sit on top of a real inbox and 
 
 Frontend: https://tigtagtoe.vercel.app
 
-The backend is local-only right now. The deployed frontend renders, but upload and the agent run need the API URL set on Vercel (see "Deploy notes" at the bottom of this file).
+Backend: Render web service (see [`docs/DEPLOY.md`](docs/DEPLOY.md)). Once `VITE_API_BASE_URL` on Vercel points at that service and `CORS_ORIGINS` includes the Vercel origin, upload → agent → inbox works for visitors.
 
 ## Stack
 
@@ -181,10 +181,13 @@ The sampler trims quoted reply chains (`-----Original Message-----` and friends)
 
 ## Deploy notes
 
-- Frontend on Vercel reads `VITE_API_BASE_URL` at build time. Point it at the Render URL.
-- Backend on Render reads everything from env vars. SQLite lives inside the container on the free tier, which means data resets when Render restarts the service. For a portfolio demo this is fine because the sample CSV is one click away. Persistent storage means moving to a paid Render plan with a disk, or switching `DATABASE_URL` to a Render Postgres instance.
-- First request to a cold Render free-tier service can take 30 to 60 seconds. The upload page shows a "warming up" state when that happens.
-- CORS is restricted to `CORS_ORIGINS`. Add your Vercel URL there.
+Full checklist: [`docs/DEPLOY.md`](docs/DEPLOY.md).
+
+- Frontend on Vercel reads `VITE_API_BASE_URL` at **build** time. Point it at the Render URL (no trailing slash) and redeploy.
+- Backend Blueprint: `backend/render.yaml`. Free tier SQLite is ephemeral; re-upload the sample CSV after a cold start. Paid disk/Postgres is optional.
+- Default `CORS_ORIGINS` includes `https://tigtagtoe.vercel.app` and local Vite. Override if you use a custom domain.
+- Offline / unreachable API surfaces a clear error (not a hung spinner), including the configured API base URL.
+- Owner blockers: `ANTHROPIC_API_KEY` on Render, creating the Render service, setting `VITE_API_BASE_URL` on Vercel.
 
 ## License
 
